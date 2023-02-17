@@ -3,27 +3,12 @@ from web3.middleware import geth_poa_middleware
 from loguru import logger
 from sys import stderr
 from multiprocessing.dummy import Pool
+#Import contract addresses
+from common import XEN_MAIN,XEN_BSC,XEN_MATIC,XEN_AVAX,XEN_EVMOS,XEN_FTM,XEN_OKX
+#Import RPC
+from common import rpc_main,rpc_bsc,rpc_matic,rpc_avax,rpc_evmos,rpc_opt,rpc_ftm,rpc_okx
 ABI = ''
 c_addr = ''
-XEN_MAIN = '0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8'
-XEN_BSC = '0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e'
-XEN_MATIC = '0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e'
-XEN_AVAX = '0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389'
-XEN_EVMOS = '0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e'
-XEN_FTM='0xeF4B763385838FfFc708000f884026B8c0434275'
-XEN_OKX='0x1cC4D981e897A3D2E7785093A648c0a75fAd0453'
-XEN_ARB = 'nil'
-XEN_OPT = 'nil'
-rpc_main = 'https://rpc.ankr.com/eth'
-rpc_bsc = 'https://rpc.ankr.com/bsc'
-rpc_matic = 'https://rpc.ankr.com/polygon'
-rpc_avax = 'https://rpc.ankr.com/avalanche'
-rpc_arb = 'https://rpc.ankr.com/avalanche'
-rpc_opt = 'https://mainnet.optimism.io'
-rpc_evmos = 'https://eth.bd.evmos.org:8545'
-rpc_ftm='https://rpc.ankr.com/fantom'
-rpc_okx='https://exchainrpc.okex.org'
-
 logger.remove()
 logger.add(stderr, format="<white>{time:HH:mm:ss}</white>"
                           " | <level>{level: <8}</level>"

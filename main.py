@@ -9,7 +9,6 @@ from common import XEN_MAIN,XEN_BSC,XEN_MATIC,XEN_AVAX,XEN_EVMOS,XEN_FTM,XEN_OKX
 from common import rpc_main,rpc_bsc,rpc_matic,rpc_avax,rpc_evmos,rpc_opt,rpc_ftm,rpc_okx
 ABI = ''
 c_addr = ''
-
 logger.remove()
 logger.add(stderr, format="<white>{time:HH:mm:ss}</white>"
                           " | <level>{level: <8}</level>"
@@ -39,19 +38,29 @@ def send_tx(private_key: str):
     except Exception as error:
         logger.error(f'{address} | {error}')
 
-
-if __name__ == '__main__':
+def xen_mint():
     print('-' * 108)
     print((' '*46)+'XEN MULTI MINTER'+(' '*46))
     print('-' * 108)
+    mint = {
+        
+    }
+def xen_claim():
+    print('-' * 108)
+    print((' '*46)+'XEN MULTI CLAIMER'+(' '*46))
+    print('-' * 108)
+    claim = {
+
+    }
+if __name__ == '__main__':
     with open('accounts.txt', encoding='utf-8-sig') as file:
         private_keys = [row.strip() for row in file]
 
     with open('ABI.txt', 'r', encoding='utf-8-sig') as file:
         ABI = file.read().strip().replace('\n', '').replace(' ', '')
-    print('Input chain:\n')
+    print('Select XEN chain:')
     print('1.Mainnet\n2.BSC Chain\n3.Polygon mainnet\n4.AVAX C-hain\n5.Evmos\n6.Fantom\n7.OKX\n')
-    rpc_ch = int(input('Input Chain for mint XEN: '))
+    rpc_ch = int(input('Input chain: '))
     if rpc_ch == 1:
         rpc = rpc_main
         c_addr = XEN_MAIN
@@ -74,6 +83,14 @@ if __name__ == '__main__':
         rpc= rpc_okx
         c_addr = XEN_OKX
 
+    print('Select action:')
+    print('1.Mint XEN Token\n2.Claim XEN Token\n')
+    action = int(input('Input selected action: '))
+    
+    if action == 1:
+        xen_mint()
+    elif action ==2:
+        xen_claim()
     w3 = Web3(Web3.HTTPProvider(rpc))
     w3.middleware_onion.inject(geth_poa_middleware, layer=0)
     contract = w3.eth.contract(address=Web3.toChecksumAddress(c_addr),

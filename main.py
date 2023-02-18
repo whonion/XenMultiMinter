@@ -14,48 +14,53 @@ logger.add(stderr, format="<white>{time:HH:mm:ss}</white>"
                           " | <level>{level: <8}</level>"
                           " | <cyan>{line}</cyan>"
                           " - <white>{message}</white>")
-
-
-def send_tx(private_key: str):
+def send_tx(tx:str,private_key: str):
     address = None
+    #TXN MINT
+    if tx == 'mint':
+        try:
+            address = Web3.toChecksumAddress(w3.eth.account.from_key(private_key).address)
+            transaction = contract.functions.claimRank(lock_time) \
+                .buildTransaction({
+                    'chainId': chain_id ,
+                    'from': address,
+                    'nonce': w3.eth.getTransactionCount(address)
+                })
 
-    try:
-        address = Web3.toChecksumAddress(w3.eth.account.from_key(private_key).address)
-        transaction = contract.functions.claimRank(lock_time) \
-            .buildTransaction({
-                'chainId': chain_id ,
-                'from': address,
-                'nonce': w3.eth.getTransactionCount(address)
-            })
+            signed_txn = w3.eth.account.signTransaction(transaction,
+                                                        private_key=private_key)
+            w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+            tx_hash = w3.toHex(w3.keccak(signed_txn.rawTransaction))
 
-        signed_txn = w3.eth.account.signTransaction(transaction,
-                                                    private_key=private_key)
-        w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        tx_hash = w3.toHex(w3.keccak(signed_txn.rawTransaction))
+            logger.info(f'{address} | {tx_hash}')
 
-        logger.info(f'{address} | {tx_hash}')
+        except Exception as error:
+            logger.error(f'{address} | {error}')
+    #TXN CLAIM
+    elif tx == 'claim':
+        try:
+            address = Web3.toChecksumAddress(w3.eth.account.from_key(private_key).address)
+            transaction = contract.functions.claimMintReward() \
+                .buildTransaction({
+                    'gas': 354853,
+                    'value': w3.toWei(0.0005, 'ether'),
+                    'gasPrice': Web3.toWei(gwei, 'gwei'),
+                    'from': address,
+                    'nonce': w3.eth.getTransactionCount(address)
+                })
+            signed_txn = w3.eth.account.signTransaction(transaction,
+                                                        private_key=private_key)
+            w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+            tx_hash = w3.toHex(w3.keccak(signed_txn.rawTransaction))
 
-    except Exception as error:
-        logger.error(f'{address} | {error}')
+            logger.info(f'{address} | {tx_hash}')
 
-def xen_mint():
-    print('-' * 108)
-    print((' '*46)+'XEN MULTI MINTER'+(' '*46))
-    print('-' * 108)
-    mint = {
-        
-    }
-def xen_claim():
-    print('-' * 108)
-    print((' '*46)+'XEN MULTI CLAIMER'+(' '*46))
-    print('-' * 108)
-    claim = {
-
-    }
+        except Exception as error:
+            logger.error(f'{address} | {error}')   
+#MAIN
 if __name__ == '__main__':
     with open('accounts.txt', encoding='utf-8-sig') as file:
         private_keys = [row.strip() for row in file]
-
     with open('ABI.txt', 'r', encoding='utf-8-sig') as file:
         ABI = file.read().strip().replace('\n', '').replace(' ', '')
     print('Select XEN chain:')
@@ -82,25 +87,22 @@ if __name__ == '__main__':
     elif rpc_ch == 7:
         rpc= rpc_okx
         c_addr = XEN_OKX
-
     print('Select action:')
     print('1.Mint XEN Token\n2.Claim XEN Token\n')
     action = int(input('Input selected action: '))
-    
-    if action == 1:
-        xen_mint()
-    elif action ==2:
-        xen_claim()
+
     w3 = Web3(Web3.HTTPProvider(rpc))
+    chain_id = w3.eth.chain_id
     w3.middleware_onion.inject(geth_poa_middleware, layer=0)
     contract = w3.eth.contract(address=Web3.toChecksumAddress(c_addr),
                                abi=ABI)
-    chain_id = w3.eth.chain_id
+    gwei = int(input('Input GWEI: '))    
+    if action == 1:
+        lock_time = int(input('Input Unlock Period(DAYS): '))
+        txn_type = 'mint'   
+    else:
+        txn_type = 'claim'
     logger.info(f'Load {len(private_keys)} wallets')
-    gwei = int(input('Input GWEI: '))
-    lock_time = int(input('Input Unlock Period(DAYS): '))
-
     with Pool(processes=len(private_keys)) as executor:
-        executor.map(send_tx, private_keys)
-
+        executor.map(send_tx(tx = txn_type), private_keys)
     input('Press Enter To Exit..')

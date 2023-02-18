@@ -9,7 +9,6 @@ from common import XEN_MAIN,XEN_BSC,XEN_MATIC,XEN_AVAX,XEN_EVMOS,XEN_FTM,XEN_OKX
 from common import rpc_main,rpc_bsc,rpc_matic,rpc_avax,rpc_evmos,rpc_opt,rpc_ftm,rpc_okx
 ABI = ''
 c_addr = ''
-
 logger.remove()
 logger.add(stderr, format="<white>{time:HH:mm:ss}</white>"
                           " | <level>{level: <8}</level>"

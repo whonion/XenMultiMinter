@@ -9,13 +9,15 @@ from common import XEN_MAIN,XEN_BSC,XEN_MATIC,XEN_AVAX,XEN_EVMOS,XEN_FTM,XEN_OKX
 from common import rpc_main,rpc_bsc,rpc_matic,rpc_avax,rpc_evmos,rpc_opt,rpc_ftm,rpc_okx
 ABI = ''
 c_addr = ''
+txn_type = ''
 logger.remove()
 logger.add(stderr, format="<white>{time:HH:mm:ss}</white>"
                           " | <level>{level: <8}</level>"
                           " | <cyan>{line}</cyan>"
                           " - <white>{message}</white>")
-def send_tx(tx:str,private_key: str):
+def send_tx(private_key: str):
     address = None
+    tx = txn_type
     #TXN MINT
     if tx == 'mint':
         try:
@@ -104,5 +106,5 @@ if __name__ == '__main__':
         txn_type = 'claim'
     logger.info(f'Load {len(private_keys)} wallets')
     with Pool(processes=len(private_keys)) as executor:
-        executor.map(send_tx(tx = txn_type), private_keys)
+        executor.map(send_tx, private_keys)
     input('Press Enter To Exit..')
